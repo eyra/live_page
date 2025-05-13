@@ -22,10 +22,14 @@ defmodule LiveNest.MixProject do
     defp elixirc_paths(_), do: ["lib"]
   
     def application do
-      [
-        mod: {LiveNest.Support.TestApplication, []},
-        extra_applications: [:logger]
-      ]
+      if Mix.env() == :test do
+        [
+          mod: {LiveNest.Support.TestApplication, []},
+          extra_applications: [:logger]
+        ]
+      else
+        []
+      end
     end
   
     defp deps do
