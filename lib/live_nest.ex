@@ -49,6 +49,11 @@ defmodule LiveNest do
         end
     end
 
+    def modal_presenter_strategy do
+        quote do
+            @behaviour LiveNest.Modal.Presenter.Strategy
+        end
+    end
 
     def single_modal_presenter_strategy do
         quote do
