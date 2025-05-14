@@ -30,15 +30,19 @@ LiveNest provides a suite of macros for structuring your LiveViews:
 
 ```elixir
 # For primary routed LiveViews
+use Phoenix.LiveView
 use LiveNest, :routed_live_view
 
 # For nested LiveViews
+use Phoenix.LiveView
 use LiveNest, :embedded_live_view
 
 # For modal LiveViews
+use Phoenix.LiveView
 use LiveNest, :modal_live_view
 
 # For modal LiveComponents
+use Phoenix.LiveComponent
 use LiveNest, :modal_live_component
 ```
 
