@@ -31,7 +31,11 @@ defmodule LiveNest.Modal do
     ]
 
     @doc """
-    Prepares a LiveView for use in a modal.
+    Prepares a modal referencing a LiveView.
+    ## Options
+    - `:style` - The style of the modal, defaults to `:default`.
+    - `:visible` - Whether the modal is visible, defaults to `true`. Can be used to preload the liveview in the background.
+    - `:session` - A keyword list of session variables to be passed to the LiveView.
     """
     @spec prepare_live_view(id(), module(), keyword()) :: t()
     def prepare_live_view(id, module, options \\ []) when is_atom(module) do
@@ -40,7 +44,14 @@ defmodule LiveNest.Modal do
         element = LiveNest.Element.prepare_live_view(id, module, session)
         prepare_modal(options, element)
     end
-  
+    
+    @doc """
+    Prepares a modal referencing a LiveComponent.
+    ## Options
+    - `:style` - The style of the modal, defaults to `:default`.
+    - `:visible` - Whether the modal is visible, defaults to `true`. Can be used to preload the livecomponent in the background.
+    - `:params` - A keyword list of params to be passed to the LiveComponent.
+    """
     @spec prepare_live_component(id(), module(), keyword()) :: t()
     def prepare_live_component(id, module, options \\ []) when is_atom(module) do
         {params, options} = Keyword.pop(options, :params, [])
@@ -50,8 +61,8 @@ defmodule LiveNest.Modal do
     end
 
     defp prepare_modal(options, element) do
-        {style, options} = Keyword.pop(options, :style)
-        {visible, options} = Keyword.pop(options, :visible)
+        {style, options} = Keyword.pop(options, :style, :default)
+        {visible, options} = Keyword.pop(options, :visible, true)
 
         %LiveNest.Modal{
             style: style,
