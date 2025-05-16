@@ -17,8 +17,8 @@ defmodule LiveNest.Demo.Dashboard.View do
   def assign_widgets(socket) do
     assign(socket,
       widgets: [
-        LiveNest.Element.prepare_live_view("data-widget", LiveNest.Demo.Data.Widget, %{"title" => "User Stats"}),
-        LiveNest.Element.prepare_live_view("chart-widget", LiveNest.Demo.Chart.Widget, %{"title" => "Activity Chart"}) 
+        LiveNest.Element.prepare_live_view("data-widget", LiveNest.Demo.Data.Widget, title: "User Stats"),
+        LiveNest.Element.prepare_live_view("chart-widget", LiveNest.Demo.Chart.Widget, title: "Activity Chart") 
       ]
     )
   end
