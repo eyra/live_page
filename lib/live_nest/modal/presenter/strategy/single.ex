@@ -40,6 +40,11 @@ defmodule LiveNest.Modal.Presenter.Strategy.Single do
                 Logger.warning("Trying to close modal #{modal_id} but found current modal to be #{current_modal_id}")
                 socket
             end
+
+            def handle_close_modal(socket, modal_id) do
+                Logger.warning("Trying to close modal #{modal_id} but no modal is present")
+                socket
+            end
         end
     end
 end

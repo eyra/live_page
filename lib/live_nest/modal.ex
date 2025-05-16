@@ -8,40 +8,62 @@ defmodule LiveNest.Modal do
     """
 
     @type id :: atom() | binary()
+    @type style :: atom()
+    @type visible :: boolean()
     @type modal_controller_pid :: pid()
     @type element :: LiveNest.Element.t()
-    @type t :: %__MODULE__{modal_controller_pid: modal_controller_pid, element: element()}
-    defstruct [:modal_controller_pid, :element]
+    @type options :: keyword()
+
+    @type t :: %__MODULE__{
+        style: style(),
+        visible: visible(),
+        modal_controller_pid: modal_controller_pid(),
+        element: element(),
+        options: options()
+    }
+
+    defstruct [
+        :style, 
+        :visible, 
+        :modal_controller_pid, 
+        :element,
+        :options
+    ]
 
     @doc """
     Prepares a LiveView for use in a modal.
     """
-    @spec prepare_live_view(id(), module(), map()) :: t()
-    def prepare_live_view(id, module, session \\ %{}) when is_atom(module) do
-        modal_controller_pid = self() 
-        session = prepare_options(session, modal_controller_pid, :live_view)
-        %LiveNest.Modal{
-            modal_controller_pid: modal_controller_pid, 
-            element: LiveNest.Element.prepare_live_view(id, module, session)
-        }
+    @spec prepare_live_view(id(), module(), keyword()) :: t()
+    def prepare_live_view(id, module, options \\ []) when is_atom(module) do
+        {session, options} = Keyword.pop(options, :session, [])
+        session = enrich_element_options(session)
+        element = LiveNest.Element.prepare_live_view(id, module, session)
+        prepare_modal(options, element)
     end
   
-    @spec prepare_live_component(id(), module(), map()) :: t()
-    def prepare_live_component(id, module, params \\ %{}) when is_atom(module) do
-        modal_controller_pid = self()
-        params = prepare_options(params, modal_controller_pid, :live_component)
+    @spec prepare_live_component(id(), module(), keyword()) :: t()
+    def prepare_live_component(id, module, options \\ []) when is_atom(module) do
+        {params, options} = Keyword.pop(options, :params, [])
+        params = enrich_element_options(params)
+        element = LiveNest.Element.prepare_live_component(id, module, params)
+        prepare_modal(options, element)
+    end
+
+    defp prepare_modal(options, element) do
+        {style, options} = Keyword.pop(options, :style)
+        {visible, options} = Keyword.pop(options, :visible)
+
         %LiveNest.Modal{
-            modal_controller_pid: modal_controller_pid, 
-            element: LiveNest.Element.prepare_live_component(id, module, params)
+            style: style,
+            visible: visible,
+            options: options,
+            modal_controller_pid: self(),
+            element: element
         }
     end
 
-    defp prepare_options(%{} = input_map, modal_controller_pid, :live_view) do
-        Map.put(input_map, "modal_controller_pid", modal_controller_pid)
-    end
-
-    defp prepare_options(%{} = input_map, modal_controller_pid, :live_component) do
-        Map.put(input_map, :modal_controller_pid, modal_controller_pid)
+    defp enrich_element_options([] = options) do
+        Keyword.put(options, :modal_controller_pid, self())
     end
     
     @doc """
