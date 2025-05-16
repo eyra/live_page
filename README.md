@@ -52,7 +52,7 @@ Implement nested LiveViews with session-based configuration:
 
 ```elixir
 # Utilize Phoenix's live_render with session parameters
-{live_render(@socket, MyApp.MyLiveView, id: "my-live-view", session: %{"key1" => "value1", "key2" => "value2"})}
+{live_render(@socket, MyApp.MyLiveView, id: "my-live-view", session: [key1: "value1", key2: "value2"])}
 
 # Implement mount callback in the nested LiveView
 def mount(:not_mounted_at_router, %{"key1" => "value1", "key2" => "value2"}, socket)
