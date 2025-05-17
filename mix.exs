@@ -20,7 +20,7 @@ defmodule LiveNest.MixProject do
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support", "test/demo"]
-  defp elixirc_paths(_), do: ["lib"]
+  defp elixirc_paths(_), do: ["lib", "test/demo"]
 
   def application do
     if Mix.env() == :test do

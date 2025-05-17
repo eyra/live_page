@@ -3,24 +3,38 @@ defmodule LiveNest.Event.Consumer do
   A behaviour for handling events in LiveNest.
   """
 
-  @type continue_propagation :: {:continue, Phoenix.LiveView.Socket.t()}
-  @type stop_propagation :: {:stop, Phoenix.LiveView.Socket.t()}
-  @type consume_result :: continue_propagation | stop_propagation
-  @callback consume_event(LiveNest.Event.t(), Phoenix.LiveView.Socket.t()) :: consume_result
+  alias Phoenix.LiveView.Socket
+  alias LiveNest.Event
+
+  @callback consume_event(event :: Event.t(), socket :: Socket.t()) ::
+              {:continue, Socket.t()} | {:stop, Socket.t()}
 
   defmacro __using__(_opts) do
     quote do
       @behaviour LiveNest.Event.Consumer
+      require Logger
+
       alias LiveNest.Event
 
       def handle_info({@event, event} = message, socket) do
-        socket =
-          case consume_event(event, socket) do
-            {:continue, socket} -> Event.Publisher.publish_event(socket, event)
-            {:stop, socket} -> socket
-          end
+        {
+          :noreply,
+          event
+          |> consume_event(socket)
+          |> handle_consumed_event(event)
+        }
+      end
 
-        {:noreply, socket}
+      def handle_consumed_event({:continue, socket}, event) do
+        socket |> Event.Publisher.publish_event(event)
+      end
+
+      def handle_consumed_event({:stop, socket}, _event) do
+        socket
+      end
+
+      def handle_consumed_event(result, _event) do
+        raise "Incorrect result from consume_event/2: #{inspect(result)}"
       end
 
       @before_compile {LiveNest.Event.Consumer, :add_fallback_behaviour}
