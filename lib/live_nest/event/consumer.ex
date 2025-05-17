@@ -3,8 +3,10 @@ defmodule LiveNest.Event.Consumer do
   A behaviour for handling events in LiveNest.
   """
 
-  @callback consume_event(LiveNest.Event.t(), Phoenix.LiveView.Socket.t()) ::
-              {:continue | :stop, Phoenix.LiveView.Socket.t()}
+  @type continue_propagation :: {:continue, Phoenix.LiveView.Socket.t()}
+  @type stop_propagation :: {:stop, Phoenix.LiveView.Socket.t()}
+  @type consume_result :: continue_propagation | stop_propagation
+  @callback consume_event(LiveNest.Event.t(), Phoenix.LiveView.Socket.t()) :: consume_result
 
   defmacro __using__(_opts) do
     quote do
@@ -28,7 +30,10 @@ defmodule LiveNest.Event.Consumer do
   defmacro add_fallback_behaviour(_env) do
     quote do
       def consume_event(event, socket) do
-        Logger.debug("consume_event/2 not implemented for #{__MODULE__}, skipping event")
+        Logger.debug(
+          "[Warning] #{__MODULE__}.consume_event/2 not implemented for event #{inspect(event)}"
+        )
+
         {:continue, socket}
       end
     end
